@@ -51,6 +51,15 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: settings.EnvInt("WS_BUFF_SIZE", 0),
 }
 
+func NewServerWithAuthCallbacks(c *Config, p func(conn ssh.ConnMetadata, password []byte) (*ssh.Permissions, error)) (*Server, error) {
+	server, err := NewServer(c)
+	if err != nil {
+		return nil, err
+	}
+	server.sshConfig.PasswordCallback = p
+	return server, err
+}
+
 // NewServer creates and returns a new chisel server
 func NewServer(c *Config) (*Server, error) {
 	server := &Server{
